@@ -1,0 +1,45 @@
+apply plugin: 'groovy'
+apply plugin: 'maven'
+apply plugin: 'maven-publish'
+repositories {
+    mavenLocal() // 使用本地仓库
+    mavenCentral()
+}
+
+publishing {
+    publications {
+        maven(MavenPublication) {
+            groupId project.group
+            artifactId project.name
+            version project.version
+            //若是war包，就写components.web,若是jar包，就写components.java
+            from components.java
+        }
+    }
+    repositories {
+        maven {
+
+            if (project.version.endsWith('-SNAPSHOT')) {
+                url = "https://oss.sonatype.org/content/repositories/snapshots/"
+            } else {
+                url = "https://oss.sonatype.org/content/repositories/releases/"
+            }
+
+            credentials {
+                username 'stalary'
+                password 'Li17853149599?'
+            }
+        }
+    }
+}
+
+group = 'com.stalary'
+version = '0.0.1-SNAPSHOT'
+sourceCompatibility = 1.8
+
+dependencies {
+//    compile 'org.codehaus.groovy:groovy-all:2.3.11' // Groovy支持(远程)
+    compile localGroovy() // Groovy支持(本地)
+    compile gradleApi() // GradleAPI支持
+    compile('com.alibaba:fastjson:1.2.51')
+}
