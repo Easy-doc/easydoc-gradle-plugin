@@ -48,7 +48,6 @@ class SaveTask extends DefaultTask {
     private void file2String(List<File> fileList) {
         StringBuilder sb = new StringBuilder()
         pathMapper(fileList)
-        println(PATH_MAP)
         sb.append(JsonOutput.toJson(PATH_MAP)).append(",,,")
         for (File file : fileList) {
             String fileName = file.getName()
@@ -88,7 +87,6 @@ class SaveTask extends DefaultTask {
     }
 
     private StringBuilder matching(StringBuilder str) {
-        println(str)
         String regex = "(?<!:)\\/\\/.*|\\/\\*(\\s|.)*?\\*\\/"
         Pattern pattern = Pattern.compile(regex)
         Matcher matcher = pattern.matcher(str)

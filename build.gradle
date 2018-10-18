@@ -18,7 +18,6 @@ publishing {
     }
     repositories {
         maven {
-
             if (project.version.endsWith('-SNAPSHOT')) {
                 url = "https://oss.sonatype.org/content/repositories/snapshots/"
             } else {
@@ -34,7 +33,7 @@ publishing {
 }
 
 group = 'com.stalary'
-version = '0.0.1-SNAPSHOT'
+version = '1.0-SNAPSHOT'
 sourceCompatibility = 1.8
 
 dependencies {

@@ -13,8 +13,8 @@ buildscript {
         }
     }
     dependencies {
-        // classpath 'com.stalary:easydoc-gradle-plugin-0.0.1-SNAPSHOT' // 依赖远程插件
-        classpath files('HelloPlugin.jar') // 依赖本地文件，需要将jar文件放到项目根目录
+        // classpath 'com.stalary:easydoc-gradle-plugin-1.0-SNAPSHOT' // 依赖远程插件
+        classpath files('easydoc-gradle-plugin-1.0-SNAPSHOT.jar') // 依赖本地文件，需要将jar文件放到项目根目录
     }
 }
 apply plugin: 'EasyDocPlugin'
