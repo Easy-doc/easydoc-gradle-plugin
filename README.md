@@ -9,7 +9,7 @@ easy-doc的gradle插件，用于存储过滤后的源文件，文件会在resouc
 buildscript {
     repositories {
         maven {
-            url 'https://oss.sonatype.org/content/groups/public/'
+            url 'https://oss.sonatype.org/content/repositories/snapshots/'
         }
     }
     dependencies {
