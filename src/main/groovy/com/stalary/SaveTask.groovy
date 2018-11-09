@@ -87,14 +87,13 @@ class SaveTask extends DefaultTask {
     }
 
     private StringBuilder matching(StringBuilder str) {
-        String regex = "(?<!:)\\/\\/.*|\\/\\*(\\s|.)*?\\*\\/"
+        String regex = "\\/\\*(\\s|.)*?\\*\\/"
         Pattern pattern = Pattern.compile(regex)
         Matcher matcher = pattern.matcher(str)
         StringBuilder sb = new StringBuilder()
         while (matcher.find()) {
             String temp = matcher
                     .group()
-                    .replaceAll("\\/\\/[^\n]*", "")
                     .replaceAll("\\/\\*\\*", "")
                     .replaceAll("\\*\\/", "")
                     .replaceAll("\\*", "")
