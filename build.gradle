@@ -37,8 +37,6 @@ version = '1.0-SNAPSHOT'
 sourceCompatibility = 1.8
 
 dependencies {
-//    compile 'org.codehaus.groovy:groovy-all:2.3.11' // Groovy支持(远程)
     compile localGroovy() // Groovy支持(本地)
     compile gradleApi() // GradleAPI支持
-    compile('com.alibaba:fastjson:1.2.51')
 }

@@ -1,18 +1,19 @@
 package com.stalary
 
 import groovy.json.JsonOutput
+import groovy.util.logging.Slf4j
 import org.gradle.api.DefaultTask
 import org.gradle.api.tasks.TaskAction
 
 import java.nio.charset.Charset
 import java.util.regex.Matcher
-import java.util.regex.Pattern
 
 /**
  * @author Stalary
  * @description
  * @date 2018/10/17
  */
+@Slf4j
 class SaveTask extends DefaultTask {
 
     private static final Map<String, String> PATH_MAP = new HashMap<>()
@@ -22,7 +23,7 @@ class SaveTask extends DefaultTask {
     @TaskAction
     void save() {
         // 开始处理
-        path =  "${project.easydoc.path}"
+        path = "${project.easydoc.path}"
         List<File> fileList = new ArrayList<>()
         String fileName = System.getProperty("user.dir") + "/src/main/java/" + path.replaceAll("\\.", "/")
         File file = new File(fileName)
@@ -62,7 +63,8 @@ class SaveTask extends DefaultTask {
                 while ((temp = reader.readLine()) != null) {
                     curSb.append(temp)
                 }
-                sb.append(matching(curSb))
+                StringBuilder cur = matching(curSb)
+                sb.append(cur)
                 // 每个文件以@@@分割
                 sb.append("@@@")
             } catch (Exception e) {
@@ -88,18 +90,22 @@ class SaveTask extends DefaultTask {
 
     private StringBuilder matching(StringBuilder str) {
         String regex = "\\/\\*(\\s|.)*?\\*\\/"
-        Pattern pattern = Pattern.compile(regex)
-        Matcher matcher = pattern.matcher(str)
+        Matcher matcher = RegularExpressionUtils.createMatcherWithTimeout(str.toString(), regex, 200)
         StringBuilder sb = new StringBuilder()
-        while (matcher.find()) {
-            String temp = matcher
-                    .group()
-                    .replaceAll("\\/\\*\\*", "")
-                    .replaceAll("\\*\\/", "")
-                    .replaceAll("\\*", "")
-                    .replaceAll(" +", " ")
-            // 每次匹配以~~分割
-            sb.append(temp).append("~~")
+        try {
+            while (matcher.find()) {
+                String temp = matcher
+                        .group()
+                        .replaceAll("\\/\\*\\*", "")
+                        .replaceAll("\\*\\/", "")
+                        .replaceAll("\\*", "")
+                        .replaceAll(" +", " ")
+                // 每次匹配以~~分割
+                sb.append(temp).append("~~")
+            }
+        } catch (Exception e) {
+            // skip
+            log.warn("matcher error, skip...")
         }
         return sb
     }
