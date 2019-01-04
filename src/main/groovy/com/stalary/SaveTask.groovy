@@ -63,7 +63,7 @@ class SaveTask extends DefaultTask {
                 while ((temp = reader.readLine()) != null) {
                     curSb.append(temp)
                 }
-                StringBuilder cur = matching(curSb)
+                StringBuilder cur = matching(curSb, name)
                 sb.append(cur)
                 // 每个文件以@@@分割
                 sb.append("@@@")
@@ -88,13 +88,14 @@ class SaveTask extends DefaultTask {
         }
     }
 
-    private StringBuilder matching(StringBuilder str) {
+    private StringBuilder matching(StringBuilder str, String name) {
         String regex = "\\/\\*(\\s|.)*?\\*\\/"
         Matcher matcher = RegularExpressionUtils.createMatcherWithTimeout(str.toString(), regex, 200)
         StringBuilder sb = new StringBuilder()
-        try {
-            while (matcher.find()) {
-                String temp = matcher
+        while (matcher.find()) {
+            String temp = ""
+            try {
+                temp = matcher
                         .group()
                         .replaceAll("\\/\\*\\*", "")
                         .replaceAll("\\*\\/", "")
@@ -102,10 +103,11 @@ class SaveTask extends DefaultTask {
                         .replaceAll(" +", " ")
                 // 每次匹配以~~分割
                 sb.append(temp).append("~~")
+            } catch (Exception e) {
+                // skip
+                log.warn("matcher error, please check it. skip..." + "\n" + name + " : " + temp)
+                log.warn("error: " + e)
             }
-        } catch (Exception e) {
-            // skip
-            log.warn("matcher error, skip...")
         }
         return sb
     }
