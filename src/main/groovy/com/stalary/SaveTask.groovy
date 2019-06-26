@@ -9,8 +9,7 @@ import java.nio.charset.Charset
 import java.util.regex.Matcher
 
 /**
- * @author Stalary
- * @description
+ * @author Stalary* @description
  * @date 2018/10/17
  */
 @Slf4j
@@ -20,12 +19,30 @@ class SaveTask extends DefaultTask {
 
     private String path
 
+    private String includeFile
+
+    private String excludeFile
+
+    private List<String> includeList = new ArrayList<>()
+
+    private List<String> excludeList = new ArrayList<>()
+
     @TaskAction
     void save() {
         // 开始处理
         path = "${project.easydoc.path}"
+        includeFile = "${project.easydoc.includeFile}"
+        excludeFile = "${project.easydoc.excludeFile}"
         List<File> fileList = new ArrayList<>()
         String fileName = System.getProperty("user.dir") + "/src/main/java/" + path.replaceAll("\\.", "/")
+        if (includeFile != '') {
+            String[] includeSplit = includeFile.split(",")
+            includeList.addAll(Arrays.asList(includeSplit))
+        }
+        if (excludeFile != '') {
+            String[] includeSplit = excludeFile.split(",")
+            excludeList.addAll(Arrays.asList(includeSplit))
+        }
         File file = new File(fileName)
         getFile(file, fileList)
         file2String(fileList)
@@ -34,7 +51,18 @@ class SaveTask extends DefaultTask {
     private void getFile(File file, List<File> fileList) {
         if (file.exists()) {
             if (file.isFile()) {
-                fileList.add(file)
+                // 获取去掉后缀的文件名
+                String name = file.getName().split("\\.")[0]
+                // 排除掉不需要的文件
+                if (!excludeList.contains(name)) {
+                    if (!includeList.isEmpty()) {
+                        if (includeList.contains(name)) {
+                            fileList.add(file)
+                        }
+                    } else {
+                        fileList.add(file)
+                    }
+                }
             } else if (file.isDirectory()) {
                 File[] files = file.listFiles()
                 if (files != null) {
@@ -73,7 +101,12 @@ class SaveTask extends DefaultTask {
                 reader.close()
             }
         }
-        String fileName = System.getProperty("user.dir").replaceAll("\\.", "/") + "/src/main/resources/easydoc.txt";
+        String fileName = System.getProperty("user.dir").replaceAll("\\.", "/") + "/src/main/resources/easydoc.txt"
+        File file = new File(fileName)
+        // 文件存在时，先删除
+        if (file.exists()) {
+            file.delete()
+        }
         // 直接使用FileWriter默认使用（ISO-8859-1 or US-ASCII）西方编码，中文会乱码
         Writer writer = null
         try {
@@ -92,10 +125,9 @@ class SaveTask extends DefaultTask {
         String regex = "\\/\\*(\\s|.)*?\\*\\/"
         Matcher matcher = RegularExpressionUtils.createMatcherWithTimeout(str.toString(), regex, 200)
         StringBuilder sb = new StringBuilder()
-        while (matcher.find()) {
-            String temp = ""
-            try {
-                temp = matcher
+        try {
+            while (matcher.find()) {
+                String temp = matcher
                         .group()
                         .replaceAll("\\/\\*\\*", "")
                         .replaceAll("\\*\\/", "")
@@ -103,11 +135,9 @@ class SaveTask extends DefaultTask {
                         .replaceAll(" +", " ")
                 // 每次匹配以~~分割
                 sb.append(temp).append("~~")
-            } catch (Exception e) {
-                // skip
-                log.warn("matcher error, please check it. skip..." + "\n" + name + " : " + temp)
-                log.warn("error: " + e)
             }
+        } catch(Exception e) {
+            log.warn("easydoc matching error, name={}, info={}", name, e.getMessage())
         }
         return sb
     }

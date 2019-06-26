@@ -1,19 +1,53 @@
+group 'com.stalary.easydoc'
 apply plugin: 'groovy'
-apply plugin: 'maven'
 apply plugin: 'maven-publish'
+apply plugin: 'signing'
 repositories {
     mavenLocal() // 使用本地仓库
     mavenCentral()
 }
+task sourcesJar(type: Jar) {
+    from sourceSets.main.allJava
+    classifier = 'sources'
+}
+task javadocJar(type: Jar) {
+    from javadoc
+    classifier = 'javadoc'
+}
 
 publishing {
     publications {
-        maven(MavenPublication) {
+        mavenJava(MavenPublication) {
             groupId project.group
             artifactId project.name
+            artifact sourcesJar
+            artifact javadocJar
             version project.version
             //若是war包，就写components.web,若是jar包，就写components.java
             from components.java
+            pom {
+                name = 'easydoc-gradle-plugin'
+                description = 'easydoc plugin for gradle'
+                url = 'https://github.com/Easy-doc/easydoc-gradle-plugin'
+                licenses {
+                    license {
+                        name = 'The Apache License, Version 2.0'
+                        url = 'http://www.apache.org/licenses/LICENSE-2.0.txt'
+                    }
+                }
+                developers {
+                    developer {
+                        id = 'stalary'
+                        name = 'stalary'
+                        email = 'stalary@163.com'
+                    }
+                }
+                scm {
+                    connection = 'scm:git:git://github.com/Easy-doc/easydoc-gradle-plugin.git'
+                    developerConnection = 'scm:git:ssh://github.com/Easy-doc/easydoc-gradle-plugin.git'
+                    url = 'https://github.com/Easy-doc/easydoc-gradle-plugin'
+                }
+            }
         }
     }
     repositories {
@@ -21,7 +55,7 @@ publishing {
             if (project.version.endsWith('-SNAPSHOT')) {
                 url = "https://oss.sonatype.org/content/repositories/snapshots/"
             } else {
-                url = "https://oss.sonatype.org/content/repositories/releases/"
+                url = "https://oss.sonatype.org/service/local/staging/deploy/maven2/"
             }
 
             credentials {
@@ -32,8 +66,13 @@ publishing {
     }
 }
 
+
+signing {
+    sign publishing.publications.mavenJava
+}
+
 group = 'com.stalary'
-version = '0.1.0'
+version = '1.0.0'
 sourceCompatibility = 1.8
 
 dependencies {
