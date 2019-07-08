@@ -1,4 +1,4 @@
-group 'com.stalary.easydoc'
+group 'com.stalary'
 apply plugin: 'groovy'
 apply plugin: 'maven-publish'
 apply plugin: 'signing'
@@ -22,7 +22,7 @@ publishing {
             artifactId project.name
             artifact sourcesJar
             artifact javadocJar
-            version project.version
+            version '1.0.0'
             //若是war包，就写components.web,若是jar包，就写components.java
             from components.java
             pom {
@@ -72,8 +72,8 @@ signing {
 }
 
 group = 'com.stalary'
-version = '1.0.0'
 sourceCompatibility = 1.8
+version = '1.0.0'
 
 dependencies {
     compile localGroovy() // Groovy支持(本地)
